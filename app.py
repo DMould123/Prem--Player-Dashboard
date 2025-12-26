@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 df = pd.read_csv("premier_league_stats.csv")
 
@@ -23,25 +24,102 @@ if selected_team != "All Teams":
     st.sidebar.metric("Total Goals", filtered_df["Goals"].sum())
     st.sidebar.metric("Total Assists", filtered_df["Assists"].sum())
 
-# Player selection from filtered list
-player = st.selectbox("Choose a player", filtered_df["Player"].unique())
-player_data = filtered_df[filtered_df["Player"] == player]
+# Add comparison mode toggle
+st.sidebar.header("View Mode")
+comparison_mode = st.sidebar.checkbox("Enable Player Comparison")
 
-# Display player info
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("Team", player_data["Team"].values[0])
-with col2:
-    st.metric("Appearances", player_data["Appearances"].values[0])
-with col3:
-    st.metric("Minutes", player_data["Minutes"].values[0])
+if comparison_mode:
+    st.header("Compare Players")
+    
+    # Select multiple players
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        player1 = st.selectbox("Player 1", filtered_df["Player"].unique(), key="p1")
+        player1_data = filtered_df[filtered_df["Player"] == player1].iloc[0]
+        
+        st.subheader(player1)
+        st.metric("Team", player1_data["Team"])
+        st.metric("Goals", player1_data["Goals"])
+        st.metric("Assists", player1_data["Assists"])
+        st.metric("Appearances", player1_data["Appearances"])
+        st.metric("Minutes", player1_data["Minutes"])
+    
+    with col2:
+        player2 = st.selectbox("Player 2", filtered_df["Player"].unique(), key="p2")
+        player2_data = filtered_df[filtered_df["Player"] == player2].iloc[0]
+        
+        st.subheader(player2)
+        st.metric("Team", player2_data["Team"])
+        st.metric("Goals", player2_data["Goals"])
+        st.metric("Assists", player2_data["Assists"])
+        st.metric("Appearances", player2_data["Appearances"])
+        st.metric("Minutes", player2_data["Minutes"])
+    
+    # Comparison chart
+    st.subheader("Side-by-Side Comparison")
+    
+    stats = ['Goals', 'Assists', 'Appearances', 'Minutes']
+    player1_stats = [player1_data[stat] for stat in stats]
+    player2_stats = [player2_data[stat] for stat in stats]
+    
+    # Normalize minutes for better visualization
+    player1_stats_viz = player1_stats[:3] + [player1_stats[3]/100]
+    player2_stats_viz = player2_stats[:3] + [player2_stats[3]/100]
+    
+    x = np.arange(len(stats))
+    width = 0.35
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bars1 = ax.bar(x - width/2, player1_stats_viz, width, label=player1, alpha=0.8)
+    bars2 = ax.bar(x + width/2, player2_stats_viz, width, label=player2, alpha=0.8)
+    
+    ax.set_xlabel('Statistics')
+    ax.set_ylabel('Value')
+    ax.set_title('Player Comparison')
+    ax.set_xticks(x)
+    ax.set_xticklabels(['Goals', 'Assists', 'Appearances', 'Minutes (x100)'])
+    ax.legend()
+    ax.grid(axis='y', alpha=0.3)
+    
+    st.pyplot(fig)
+    
+    # Goals per game comparison
+    st.subheader("Per Game Statistics")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.write(f"**{player1}**")
+        if player1_data["Appearances"] > 0:
+            st.metric("Goals per Game", f"{player1_data['Goals']/player1_data['Appearances']:.2f}")
+            st.metric("Assists per Game", f"{player1_data['Assists']/player1_data['Appearances']:.2f}")
+    
+    with col2:
+        st.write(f"**{player2}**")
+        if player2_data["Appearances"] > 0:
+            st.metric("Goals per Game", f"{player2_data['Goals']/player2_data['Appearances']:.2f}")
+            st.metric("Assists per Game", f"{player2_data['Assists']/player2_data['Appearances']:.2f}")
 
-st.write(player_data)
+else:
+    # Original single player view
+    player = st.selectbox("Choose a player", filtered_df["Player"].unique())
+    player_data = filtered_df[filtered_df["Player"] == player]
 
-# Basic bar chart
-fig, ax = plt.subplots()
-ax.bar(["Goals", "Assists"], [player_data["Goals"].values[0],
-       player_data["Assists"].values[0]])
-ax.set_ylabel("Count")
-ax.set_title(f"{player}'s Goals and Assists")
-st.pyplot(fig)
+    # Display player info
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Team", player_data["Team"].values[0])
+    with col2:
+        st.metric("Appearances", player_data["Appearances"].values[0])
+    with col3:
+        st.metric("Minutes", player_data["Minutes"].values[0])
+
+    st.write(player_data)
+
+    # Basic bar chart
+    fig, ax = plt.subplots()
+    ax.bar(["Goals", "Assists"], [player_data["Goals"].values[0],
+           player_data["Assists"].values[0]])
+    ax.set_ylabel("Count")
+    ax.set_title(f"{player}'s Goals and Assists")
+    st.pyplot(fig)
