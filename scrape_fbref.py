@@ -21,11 +21,20 @@ if csv_files:
     # Check what columns are available
     print("Available columns:", df.columns.tolist())
     
-    # Map to our required format (adjust column names based on what's available)
-    # You may need to adjust these column names based on the actual CSV
+    # Map to our required format INCLUDING position
     if 'Player' in df.columns and 'Squad' in df.columns:
-        df_clean = df[['Player', 'Squad', 'Gls', 'Ast', 'MP', 'Min']].copy()
-        df_clean.columns = ['Player', 'Team', 'Goals', 'Assists', 'Appearances', 'Minutes']
+        df_clean = df[['Player', 'Squad', 'Pos', 'Gls', 'Ast', 'MP', 'Min']].copy()
+        df_clean.columns = ['Player', 'Team', 'Position', 'Goals', 'Assists', 'Appearances', 'Minutes']
+        
+        # Standardize positions - take only the primary position (first one)
+        def standardize_position(pos):
+            if pd.isna(pos):
+                return 'Unknown'
+            # Take only the first position if multiple are listed
+            primary_pos = str(pos).split(',')[0].strip()
+            return primary_pos
+        
+        df_clean['Position'] = df_clean['Position'].apply(standardize_position)
         
         # Save to your project directory
         df_clean.to_csv('premier_league_stats.csv', index=False)

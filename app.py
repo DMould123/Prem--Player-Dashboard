@@ -12,17 +12,26 @@ st.sidebar.header("Filters")
 teams = ["All Teams"] + sorted(df["Team"].unique().tolist())
 selected_team = st.sidebar.selectbox("Select Team", teams)
 
-# Filter dataframe by team
-if selected_team != "All Teams":
-    filtered_df = df[df["Team"] == selected_team]
-else:
-    filtered_df = df
+# Add position filter with specific order
+position_order = ["GK", "DF", "MF", "FW"]
+available_positions = [pos for pos in position_order if pos in df["Position"].unique()]
+positions = ["All Positions"] + available_positions
+selected_position = st.sidebar.selectbox("Select Position", positions)
 
-# Show team stats summary
+# Filter dataframe by team and position
+filtered_df = df.copy()
+
 if selected_team != "All Teams":
-    st.sidebar.metric("Total Players", len(filtered_df))
-    st.sidebar.metric("Total Goals", filtered_df["Goals"].sum())
-    st.sidebar.metric("Total Assists", filtered_df["Assists"].sum())
+    filtered_df = filtered_df[filtered_df["Team"] == selected_team]
+
+if selected_position != "All Positions":
+    filtered_df = filtered_df[filtered_df["Position"] == selected_position]
+
+# Show filtered stats summary
+st.sidebar.metric("Filtered Players", len(filtered_df))
+if len(filtered_df) > 0:
+    st.sidebar.metric("Total Goals", int(filtered_df["Goals"].sum()))
+    st.sidebar.metric("Total Assists", int(filtered_df["Assists"].sum()))
 
 # Add comparison mode toggle
 st.sidebar.header("View Mode")
@@ -39,22 +48,24 @@ if comparison_mode:
         player1_data = filtered_df[filtered_df["Player"] == player1].iloc[0]
         
         st.subheader(player1)
+        st.metric("Position", player1_data["Position"])
         st.metric("Team", player1_data["Team"])
-        st.metric("Goals", player1_data["Goals"])
-        st.metric("Assists", player1_data["Assists"])
-        st.metric("Appearances", player1_data["Appearances"])
-        st.metric("Minutes", player1_data["Minutes"])
+        st.metric("Goals", int(player1_data["Goals"]))
+        st.metric("Assists", int(player1_data["Assists"]))
+        st.metric("Appearances", int(player1_data["Appearances"]))
+        st.metric("Minutes", int(player1_data["Minutes"]))
     
     with col2:
         player2 = st.selectbox("Player 2", filtered_df["Player"].unique(), key="p2")
         player2_data = filtered_df[filtered_df["Player"] == player2].iloc[0]
         
         st.subheader(player2)
+        st.metric("Position", player2_data["Position"])
         st.metric("Team", player2_data["Team"])
-        st.metric("Goals", player2_data["Goals"])
-        st.metric("Assists", player2_data["Assists"])
-        st.metric("Appearances", player2_data["Appearances"])
-        st.metric("Minutes", player2_data["Minutes"])
+        st.metric("Goals", int(player2_data["Goals"]))
+        st.metric("Assists", int(player2_data["Assists"]))
+        st.metric("Appearances", int(player2_data["Appearances"]))
+        st.metric("Minutes", int(player2_data["Minutes"]))
     
     # Comparison chart
     st.subheader("Side-by-Side Comparison")
@@ -76,7 +87,7 @@ if comparison_mode:
     
     ax.set_xlabel('Statistics')
     ax.set_ylabel('Value')
-    ax.set_title('Player Comparison')
+    ax.set_title(f'Player Comparison - {player1_data["Position"]} vs {player2_data["Position"]}')
     ax.set_xticks(x)
     ax.set_xticklabels(['Goals', 'Assists', 'Appearances', 'Minutes (x100)'])
     ax.legend()
@@ -106,20 +117,22 @@ else:
     player_data = filtered_df[filtered_df["Player"] == player]
 
     # Display player info
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Team", player_data["Team"].values[0])
+        st.metric("Position", player_data["Position"].values[0])
     with col2:
-        st.metric("Appearances", player_data["Appearances"].values[0])
+        st.metric("Team", player_data["Team"].values[0])
     with col3:
-        st.metric("Minutes", player_data["Minutes"].values[0])
+        st.metric("Appearances", int(player_data["Appearances"].values[0]))
+    with col4:
+        st.metric("Minutes", int(player_data["Minutes"].values[0]))
 
     st.write(player_data)
 
     # Basic bar chart
     fig, ax = plt.subplots()
-    ax.bar(["Goals", "Assists"], [player_data["Goals"].values[0],
-           player_data["Assists"].values[0]])
+    ax.bar(["Goals", "Assists"], [int(player_data["Goals"].values[0]),
+           int(player_data["Assists"].values[0])])
     ax.set_ylabel("Count")
-    ax.set_title(f"{player}'s Goals and Assists")
+    ax.set_title(f"{player}'s Goals and Assists ({player_data['Position'].values[0]})")
     st.pyplot(fig)
