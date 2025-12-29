@@ -34,7 +34,13 @@ Support
 
 🔍 Interactive player selection via dropdown
 
+⚽ Filter players by team and position (GK, DF, MF, FW)
+
 📈 Visual charts for Goals vs Assists
+
+👥 Side-by-side player comparison mode
+
+📉 Per-game statistics (goals/assists per game)
 
 🔄 Real-time data from FBref via Kaggle API
 
@@ -99,11 +105,13 @@ The dashboard opens automatically in your default web browser.
 
 Step 3: Explore the dashboard
 
-Select a player from the dropdown
+Use the sidebar to filter by team and/or position
 
-View player statistics in the main panel
+Select a player from the dropdown to view their stats
 
-Analyze the Goals vs Assists chart
+Enable "Player Comparison" mode to compare two players side-by-side
+
+Analyze the Goals vs Assists chart and per-game statistics
 
 Switch players to compare performance
 
@@ -130,6 +138,7 @@ Total Players: 574+
 📈 Available Statistics
 Statistic	Description
 Player	Full player name
+Position	Player position (GK, DF, MF, FW)
 Team	Current club
 Goals	Total goals scored
 Assists	Total assists
