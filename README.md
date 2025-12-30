@@ -36,11 +36,15 @@ Support
 
 ⚽ Filter players by team and position (GK, DF, MF, FW)
 
+🏆 Leaderboards showing top 10 goal scorers, assist providers, and total contributors
+
 📈 Visual charts for Goals vs Assists
 
 👥 Side-by-side player comparison mode
 
 📉 Per-game statistics (goals/assists per game)
+
+📑 Organized tab interface (Player Stats, Leaderboards, Compare Players)
 
 🔄 Real-time data from FBref via Kaggle API
 
@@ -105,15 +109,15 @@ The dashboard opens automatically in your default web browser.
 
 Step 3: Explore the dashboard
 
-Use the sidebar to filter by team and/or position
+The dashboard has 3 main tabs:
 
-Select a player from the dropdown to view their stats
+🏠 **Player Stats** - View individual player statistics and charts
 
-Enable "Player Comparison" mode to compare two players side-by-side
+🏆 **Leaderboards** - See top 10 performers (goals, assists, total contributions)
 
-Analyze the Goals vs Assists chart and per-game statistics
+👥 **Compare Players** - Side-by-side comparison of two players
 
-Switch players to compare performance
+Use the sidebar to filter by team and/or position across all tabs
 
 📁 Project Structure
 File	Description
