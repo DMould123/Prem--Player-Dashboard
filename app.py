@@ -7,6 +7,9 @@ df = pd.read_csv("premier_league_stats.csv")
 
 st.title("Premier League Player Stats")
 
+# Create tabs for different views
+tab1, tab2, tab3 = st.tabs(["🏠 Player Stats", "🏆 Leaderboards", "👥 Compare Players"])
+
 # Add team filter in sidebar
 st.sidebar.header("Filters")
 teams = ["All Teams"] + sorted(df["Team"].unique().tolist())
@@ -33,12 +36,85 @@ if len(filtered_df) > 0:
     st.sidebar.metric("Total Goals", int(filtered_df["Goals"].sum()))
     st.sidebar.metric("Total Assists", int(filtered_df["Assists"].sum()))
 
-# Add comparison mode toggle
-st.sidebar.header("View Mode")
-comparison_mode = st.sidebar.checkbox("Enable Player Comparison")
+# TAB 1: PLAYER STATS
+with tab1:
+    # Original single player view
+    player = st.selectbox("Choose a player", filtered_df["Player"].unique())
+    player_data = filtered_df[filtered_df["Player"] == player]
 
-if comparison_mode:
-    st.header("Compare Players")
+    # Display player info
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Position", player_data["Position"].values[0])
+    with col2:
+        st.metric("Team", player_data["Team"].values[0])
+    with col3:
+        st.metric("Appearances", int(player_data["Appearances"].values[0]))
+    with col4:
+        st.metric("Minutes", int(player_data["Minutes"].values[0]))
+
+    st.write(player_data)
+
+    # Basic bar chart
+    fig, ax = plt.subplots()
+    ax.bar(["Goals", "Assists"], [int(player_data["Goals"].values[0]),
+           int(player_data["Assists"].values[0])])
+    ax.set_ylabel("Count")
+    ax.set_title(f"{player}'s Goals and Assists ({player_data['Position'].values[0]})")
+    st.pyplot(fig)
+
+# TAB 2: LEADERBOARDS
+with tab2:
+    st.header("🏆 Top Performers")
+    
+    # Top Goal Scorers
+    st.subheader("⚽ Top 10 Goal Scorers")
+    top_scorers = df.nlargest(10, 'Goals')[['Player', 'Team', 'Position', 'Goals', 'Appearances']]
+    top_scorers['Goals/Game'] = (top_scorers['Goals'] / top_scorers['Appearances']).round(2)
+    top_scorers.index = range(1, len(top_scorers) + 1)
+    st.dataframe(top_scorers, use_container_width=True)
+    
+    # Top Assist Providers
+    st.subheader("🎯 Top 10 Assist Providers")
+    top_assisters = df.nlargest(10, 'Assists')[['Player', 'Team', 'Position', 'Assists', 'Appearances']]
+    top_assisters['Assists/Game'] = (top_assisters['Assists'] / top_assisters['Appearances']).round(2)
+    top_assisters.index = range(1, len(top_assisters) + 1)
+    st.dataframe(top_assisters, use_container_width=True)
+    
+    # Combined Goals + Assists
+    st.subheader("🌟 Top 10 Goal Contributions (Goals + Assists)")
+    df['Total Contributions'] = df['Goals'] + df['Assists']
+    top_contributors = df.nlargest(10, 'Total Contributions')[['Player', 'Team', 'Position', 'Goals', 'Assists', 'Total Contributions', 'Appearances']]
+    top_contributors['Contributions/Game'] = (top_contributors['Total Contributions'] / top_contributors['Appearances']).round(2)
+    top_contributors.index = range(1, len(top_contributors) + 1)
+    st.dataframe(top_contributors, use_container_width=True)
+    
+    # Visualization
+    st.subheader("📊 Top 5 Scorers vs Assisters")
+    top5_scorers = df.nlargest(5, 'Goals')
+    top5_assisters = df.nlargest(5, 'Assists')
+    
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+    
+    # Top Scorers Chart
+    ax1.barh(top5_scorers['Player'], top5_scorers['Goals'], color='#FF6B6B')
+    ax1.set_xlabel('Goals')
+    ax1.set_title('Top 5 Goal Scorers')
+    ax1.invert_yaxis()
+    
+    # Top Assisters Chart
+    ax2.barh(top5_assisters['Player'], top5_assisters['Assists'], color='#4ECDC4')
+    ax2.set_xlabel('Assists')
+    ax2.set_title('Top 5 Assist Providers')
+    ax2.invert_yaxis()
+    
+    plt.tight_layout()
+    st.pyplot(fig)
+
+# TAB 3: COMPARE PLAYERS
+# TAB 3: COMPARE PLAYERS
+with tab3:
+    st.header("👥 Compare Players")
     
     # Select multiple players
     col1, col2 = st.columns(2)
@@ -110,29 +186,3 @@ if comparison_mode:
         if player2_data["Appearances"] > 0:
             st.metric("Goals per Game", f"{player2_data['Goals']/player2_data['Appearances']:.2f}")
             st.metric("Assists per Game", f"{player2_data['Assists']/player2_data['Appearances']:.2f}")
-
-else:
-    # Original single player view
-    player = st.selectbox("Choose a player", filtered_df["Player"].unique())
-    player_data = filtered_df[filtered_df["Player"] == player]
-
-    # Display player info
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Position", player_data["Position"].values[0])
-    with col2:
-        st.metric("Team", player_data["Team"].values[0])
-    with col3:
-        st.metric("Appearances", int(player_data["Appearances"].values[0]))
-    with col4:
-        st.metric("Minutes", int(player_data["Minutes"].values[0]))
-
-    st.write(player_data)
-
-    # Basic bar chart
-    fig, ax = plt.subplots()
-    ax.bar(["Goals", "Assists"], [int(player_data["Goals"].values[0]),
-           int(player_data["Assists"].values[0])])
-    ax.set_ylabel("Count")
-    ax.set_title(f"{player}'s Goals and Assists ({player_data['Position'].values[0]})")
-    st.pyplot(fig)
