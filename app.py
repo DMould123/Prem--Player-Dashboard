@@ -38,9 +38,25 @@ if len(filtered_df) > 0:
 
 # TAB 1: PLAYER STATS
 with tab1:
-    # Original single player view
-    player = st.selectbox("Choose a player", filtered_df["Player"].unique())
-    player_data = filtered_df[filtered_df["Player"] == player]
+    # Add search filter
+    st.subheader("🔍 Search Player")
+    search_term = st.text_input("Type player name to search", "").strip()
+    
+    # Filter players based on search term
+    if search_term:
+        search_filtered_df = filtered_df[filtered_df["Player"].str.contains(search_term, case=False, na=False)]
+        if len(search_filtered_df) == 0:
+            st.warning(f"No players found matching '{search_term}'")
+            st.stop()
+    else:
+        search_filtered_df = filtered_df
+    
+    # Display number of matching players
+    st.info(f"Found {len(search_filtered_df)} player(s)")
+    
+    # Player selection from search-filtered list
+    player = st.selectbox("Choose a player", search_filtered_df["Player"].unique())
+    player_data = search_filtered_df[search_filtered_df["Player"] == player]
 
     # Display player info
     col1, col2, col3, col4 = st.columns(4)

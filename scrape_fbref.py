@@ -26,13 +26,33 @@ if csv_files:
         df_clean = df[['Player', 'Squad', 'Pos', 'Gls', 'Ast', 'MP', 'Min']].copy()
         df_clean.columns = ['Player', 'Team', 'Position', 'Goals', 'Assists', 'Appearances', 'Minutes']
         
-        # Standardize positions - take only the primary position (first one)
+        # Standardize positions - handle multiple separators and classify properly
         def standardize_position(pos):
             if pd.isna(pos):
                 return 'Unknown'
-            # Take only the first position if multiple are listed
-            primary_pos = str(pos).split(',')[0].strip()
-            return primary_pos
+            
+            # Convert to string and clean
+            pos_str = str(pos).strip()
+            
+            # Split by comma or space to get primary position
+            for sep in [',', ' ']:
+                if sep in pos_str:
+                    pos_str = pos_str.split(sep)[0].strip()
+                    break
+            
+            # Categorize versatile players
+            # FW,MF or MF,FW (wingers, attacking mids) -> classify as their primary position
+            pos_upper = pos_str.upper()
+            
+            # Standard positions
+            if pos_upper in ['GK', 'DF', 'MF', 'FW']:
+                return pos_upper
+            
+            # If it's still combined after split, take first 2 characters
+            if len(pos_upper) > 2:
+                return pos_upper[:2]
+            
+            return pos_upper
         
         df_clean['Position'] = df_clean['Position'].apply(standardize_position)
         
