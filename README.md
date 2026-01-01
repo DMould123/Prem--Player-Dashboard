@@ -36,6 +36,8 @@ Support
 
 🔎 Player search filter to quickly find specific players
 
+👤 Player profiles with nationality and age information
+
 ⚽ Filter players by team and position (GK, DF, MF, FW)
 
 🏆 Leaderboards showing top 10 goal scorers, assist providers, and total contributors
@@ -152,6 +154,8 @@ Total Players: 574+
 **Basic Stats:**
 Statistic	Description
 Player	Full player name
+Nationality	Player's country (3-letter code)
+Age	Player's current age
 Position	Player position (GK, DF, MF, FW)
 Team	Current club
 Goals	Total goals scored
