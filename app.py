@@ -5,6 +5,18 @@ import numpy as np
 
 df = pd.read_csv("premier_league_stats.csv")
 
+# Calculate advanced statistics (per 90 minutes)
+df["Goals_per_90"] = (df["Goals"] / df["Minutes"] * 90).round(2)
+df["Assists_per_90"] = (df["Assists"] / df["Minutes"] * 90).round(2)
+df["G+A_per_90"] = ((df["Goals"] + df["Assists"]) / df["Minutes"] * 90).round(2)
+
+# Calculate efficiency metrics
+df["Minutes_per_Goal"] = (df["Minutes"] / df["Goals"]).replace([np.inf, -np.inf], 0).round(0)
+df["Minutes_per_Contribution"] = (df["Minutes"] / (df["Goals"] + df["Assists"])).replace([np.inf, -np.inf], 0).round(0)
+
+# Replace NaN and inf values with 0
+df = df.fillna(0)
+
 st.title("Premier League Player Stats")
 
 # Create tabs for different views
@@ -56,27 +68,68 @@ with tab1:
     
     # Player selection from search-filtered list
     player = st.selectbox("Choose a player", search_filtered_df["Player"].unique())
-    player_data = search_filtered_df[search_filtered_df["Player"] == player]
+    player_data = search_filtered_df[search_filtered_df["Player"] == player].iloc[0]
 
-    # Display player info
+    # Display player basic info
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Position", player_data["Position"].values[0])
+        st.metric("Position", player_data["Position"])
     with col2:
-        st.metric("Team", player_data["Team"].values[0])
+        st.metric("Team", player_data["Team"])
     with col3:
-        st.metric("Appearances", int(player_data["Appearances"].values[0]))
+        st.metric("Appearances", int(player_data["Appearances"]))
     with col4:
-        st.metric("Minutes", int(player_data["Minutes"].values[0]))
+        st.metric("Minutes", int(player_data["Minutes"]))
+    
+    # Display total stats
+    st.subheader("📊 Season Totals")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Goals", int(player_data["Goals"]))
+    with col2:
+        st.metric("Assists", int(player_data["Assists"]))
+    with col3:
+        st.metric("Goal Contributions", int(player_data["Goals"] + player_data["Assists"]))
+    
+    # Display advanced stats (per 90 minutes)
+    st.subheader("⚡ Per 90 Minutes")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Goals per 90", f"{player_data['Goals_per_90']:.2f}")
+    with col2:
+        st.metric("Assists per 90", f"{player_data['Assists_per_90']:.2f}")
+    with col3:
+        st.metric("G+A per 90", f"{player_data['G+A_per_90']:.2f}")
+    
+    # Display efficiency metrics
+    st.subheader("🎯 Efficiency")
+    col1, col2 = st.columns(2)
+    with col1:
+        mins_per_goal = player_data["Minutes_per_Goal"]
+        if mins_per_goal > 0 and mins_per_goal != np.inf:
+            st.metric("Minutes per Goal", f"{int(mins_per_goal)}")
+        else:
+            st.metric("Minutes per Goal", "N/A")
+    with col2:
+        mins_per_contrib = player_data["Minutes_per_Contribution"]
+        if mins_per_contrib > 0 and mins_per_contrib != np.inf:
+            st.metric("Minutes per Contribution", f"{int(mins_per_contrib)}")
+        else:
+            st.metric("Minutes per Contribution", "N/A")
 
-    st.write(player_data)
+    # Display full data table
+    st.subheader("📋 Complete Stats")
+    display_cols = ['Player', 'Team', 'Position', 'Goals', 'Assists', 'Appearances', 'Minutes', 
+                    'Goals_per_90', 'Assists_per_90', 'G+A_per_90']
+    st.dataframe(search_filtered_df[search_filtered_df["Player"] == player][display_cols], use_container_width=True)
 
-    # Basic bar chart
+    # Visualization - Goals vs Assists
+    st.subheader("📈 Goals vs Assists")
     fig, ax = plt.subplots()
-    ax.bar(["Goals", "Assists"], [int(player_data["Goals"].values[0]),
-           int(player_data["Assists"].values[0])])
+    ax.bar(["Goals", "Assists"], [int(player_data["Goals"]),
+           int(player_data["Assists"])])
     ax.set_ylabel("Count")
-    ax.set_title(f"{player}'s Goals and Assists ({player_data['Position'].values[0]})")
+    ax.set_title(f"{player}'s Goals and Assists ({player_data['Position']})")
     st.pyplot(fig)
 
 # TAB 2: LEADERBOARDS
@@ -104,6 +157,24 @@ with tab2:
     top_contributors['Contributions/Game'] = (top_contributors['Total Contributions'] / top_contributors['Appearances']).round(2)
     top_contributors.index = range(1, len(top_contributors) + 1)
     st.dataframe(top_contributors, use_container_width=True)
+    
+    # Per 90 Minutes Leaderboards
+    st.subheader("⚡ Top 10 by Per 90 Minutes (min. 500 minutes)")
+    qualified_df = df[df['Minutes'] >= 500]
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.write("**Goals per 90**")
+        top_goals_per90 = qualified_df.nlargest(10, 'Goals_per_90')[['Player', 'Team', 'Position', 'Goals', 'Minutes', 'Goals_per_90']]
+        top_goals_per90.index = range(1, len(top_goals_per90) + 1)
+        st.dataframe(top_goals_per90, use_container_width=True)
+    
+    with col2:
+        st.write("**G+A per 90**")
+        top_ga_per90 = qualified_df.nlargest(10, 'G+A_per_90')[['Player', 'Team', 'Position', 'Goals', 'Assists', 'G+A_per_90']]
+        top_ga_per90.index = range(1, len(top_ga_per90) + 1)
+        st.dataframe(top_ga_per90, use_container_width=True)
     
     # Visualization
     st.subheader("📊 Top 5 Scorers vs Assisters")
