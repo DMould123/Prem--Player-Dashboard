@@ -23,8 +23,8 @@ if csv_files:
     
     # Map to our required format INCLUDING position
     if 'Player' in df.columns and 'Squad' in df.columns:
-        df_clean = df[['Player', 'Squad', 'Pos', 'Gls', 'Ast', 'MP', 'Min']].copy()
-        df_clean.columns = ['Player', 'Team', 'Position', 'Goals', 'Assists', 'Appearances', 'Minutes']
+        df_clean = df[['Player', 'Nation', 'Pos', 'Squad', 'Age', 'Born', 'Gls', 'Ast', 'MP', 'Min']].copy()
+        df_clean.columns = ['Player', 'Nationality', 'Position', 'Team', 'Age', 'Year_Born', 'Goals', 'Assists', 'Appearances', 'Minutes']
         
         # Standardize positions - handle multiple separators and classify properly
         def standardize_position(pos):
@@ -55,6 +55,20 @@ if csv_files:
             return pos_upper
         
         df_clean['Position'] = df_clean['Position'].apply(standardize_position)
+        
+        # Clean nationality - extract just the 3-letter country code
+        def clean_nationality(nat):
+            if pd.isna(nat):
+                return 'Unknown'
+            # Nationality format is like "eng ENG" or "ch SUI" - take the last 3 characters
+            nat_str = str(nat).strip()
+            # Split by space and take the last part (the uppercase code)
+            parts = nat_str.split()
+            if len(parts) > 1:
+                return parts[-1]  # Return the last part (e.g., "ENG", "SUI", "USA")
+            return nat_str.upper()
+        
+        df_clean['Nationality'] = df_clean['Nationality'].apply(clean_nationality)
         
         # Save to your project directory
         df_clean.to_csv('premier_league_stats.csv', index=False)

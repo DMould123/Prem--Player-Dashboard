@@ -70,15 +70,27 @@ with tab1:
     player = st.selectbox("Choose a player", search_filtered_df["Player"].unique())
     player_data = search_filtered_df[search_filtered_df["Player"] == player].iloc[0]
 
-    # Display player basic info
+    # Display player name as header
+    st.header(f"⚽ {player}")
+    
+    # Display position, team, nationality, and age in one line
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Position", player_data["Position"])
+        st.markdown(f"**Position:** {player_data['Position']}")
     with col2:
-        st.metric("Team", player_data["Team"])
+        st.markdown(f"**Team:** {player_data['Team']}")
     with col3:
-        st.metric("Appearances", int(player_data["Appearances"]))
+        st.markdown(f"**Nationality:** {player_data['Nationality']}")
     with col4:
+        st.markdown(f"**Age:** {int(player_data['Age'])}")
+    
+    st.divider()
+
+    # Display player basic info
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Appearances", int(player_data["Appearances"]))
+    with col2:
         st.metric("Minutes", int(player_data["Minutes"]))
     
     # Display total stats
