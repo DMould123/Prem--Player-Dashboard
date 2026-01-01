@@ -46,6 +46,10 @@ Support
 
 📉 Per-game statistics (goals/assists per game)
 
+⚡ Advanced per 90 minutes metrics (Goals/90, Assists/90, G+A/90)
+
+🎯 Efficiency metrics (Minutes per Goal, Minutes per Contribution)
+
 📑 Organized tab interface (Player Stats, Leaderboards, Compare Players)
 
 🔄 Real-time data from FBref via Kaggle API
@@ -144,6 +148,8 @@ Update Method: Kaggle API
 Total Players: 574+
 
 📈 Available Statistics
+
+**Basic Stats:**
 Statistic	Description
 Player	Full player name
 Position	Player position (GK, DF, MF, FW)
@@ -152,6 +158,14 @@ Goals	Total goals scored
 Assists	Total assists
 Appearances	Matches played (MP)
 Minutes	Minutes played
+
+**Advanced Metrics:**
+Statistic	Description
+Goals per 90	Goals scored per 90 minutes
+Assists per 90	Assists provided per 90 minutes
+G+A per 90	Total goal contributions per 90 minutes
+Minutes per Goal	Average minutes played per goal scored
+Minutes per Contribution	Average minutes per goal or assist
 🔄 Updating Data
 
 To refresh the dashboard with the latest statistics:
