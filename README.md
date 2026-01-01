@@ -34,6 +34,8 @@ Support
 
 🔍 Interactive player selection via dropdown
 
+🔎 Player search filter to quickly find specific players
+
 ⚽ Filter players by team and position (GK, DF, MF, FW)
 
 🏆 Leaderboards showing top 10 goal scorers, assist providers, and total contributors
@@ -111,13 +113,15 @@ Step 3: Explore the dashboard
 
 The dashboard has 3 main tabs:
 
-🏠 **Player Stats** - View individual player statistics and charts
+🏠 **Player Stats** - View individual player statistics and charts with search functionality
 
 🏆 **Leaderboards** - See top 10 performers (goals, assists, total contributions)
 
 👥 **Compare Players** - Side-by-side comparison of two players
 
 Use the sidebar to filter by team and/or position across all tabs
+
+In the Player Stats tab, use the search box to quickly find players by typing their name
 
 📁 Project Structure
 File	Description
