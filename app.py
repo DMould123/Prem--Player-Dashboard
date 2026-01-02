@@ -211,32 +211,47 @@ with tab2:
     st.pyplot(fig)
 
 # TAB 3: COMPARE PLAYERS
-# TAB 3: COMPARE PLAYERS
 with tab3:
     st.header("👥 Compare Players")
     
-    # Select multiple players
+    # Add search filters for both players
     col1, col2 = st.columns(2)
     
     with col1:
-        player1 = st.selectbox("Player 1", filtered_df["Player"].unique(), key="p1")
+        st.subheader("Player 1")
+        search_term1 = st.text_input("Search Player 1", "", key="search1").strip()
+        
+        # Filter players based on search term
+        if search_term1:
+            search_filtered_df1 = filtered_df[filtered_df["Player"].str.contains(search_term1, case=False, na=False)]
+        else:
+            search_filtered_df1 = filtered_df
+        
+        player1 = st.selectbox("Select Player 1", search_filtered_df1["Player"].unique(), key="p1")
         player1_data = filtered_df[filtered_df["Player"] == player1].iloc[0]
         
-        st.subheader(player1)
-        st.metric("Position", player1_data["Position"])
-        st.metric("Team", player1_data["Team"])
+        st.markdown(f"**Position:** {player1_data['Position']}")
+        st.markdown(f"**Team:** {player1_data['Team']}")
         st.metric("Goals", int(player1_data["Goals"]))
         st.metric("Assists", int(player1_data["Assists"]))
         st.metric("Appearances", int(player1_data["Appearances"]))
         st.metric("Minutes", int(player1_data["Minutes"]))
     
     with col2:
-        player2 = st.selectbox("Player 2", filtered_df["Player"].unique(), key="p2")
+        st.subheader("Player 2")
+        search_term2 = st.text_input("Search Player 2", "", key="search2").strip()
+        
+        # Filter players based on search term
+        if search_term2:
+            search_filtered_df2 = filtered_df[filtered_df["Player"].str.contains(search_term2, case=False, na=False)]
+        else:
+            search_filtered_df2 = filtered_df
+        
+        player2 = st.selectbox("Select Player 2", search_filtered_df2["Player"].unique(), key="p2")
         player2_data = filtered_df[filtered_df["Player"] == player2].iloc[0]
         
-        st.subheader(player2)
-        st.metric("Position", player2_data["Position"])
-        st.metric("Team", player2_data["Team"])
+        st.markdown(f"**Position:** {player2_data['Position']}")
+        st.markdown(f"**Team:** {player2_data['Team']}")
         st.metric("Goals", int(player2_data["Goals"]))
         st.metric("Assists", int(player2_data["Assists"]))
         st.metric("Appearances", int(player2_data["Appearances"]))
