@@ -40,9 +40,11 @@ Support
 
 ⚽ Filter players by team and position (GK, DF, MF, FW)
 
+🧤 Position-specific displays with goalkeeper statistics (Clean Sheets, Goals Against, Save %)
+
 🏆 Leaderboards showing top 10 goal scorers, assist providers, and total contributors
 
-📈 Visual charts for Goals vs Assists
+📈 Visual charts customized by position (GK vs outfield players)
 
 👥 Side-by-side player comparison mode with search filters
 
@@ -159,6 +161,13 @@ Goals Total goals scored
 Assists Total assists
 Appearances Matches played (MP)
 Minutes Minutes played
+
+**Goalkeeper-Specific Stats:**
+Statistic Description
+Clean Sheets Matches with no goals conceded
+Goals Against Total goals conceded
+Save Percentage Shot save success rate
+Clean Sheet % Percentage of matches with clean sheets
 
 **Advanced Metrics:**
 Statistic Description
