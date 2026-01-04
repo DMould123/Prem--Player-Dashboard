@@ -93,56 +93,120 @@ with tab1:
     with col2:
         st.metric("Minutes", int(player_data["Minutes"]))
     
-    # Display total stats
-    st.subheader("📊 Season Totals")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Goals", int(player_data["Goals"]))
-    with col2:
-        st.metric("Assists", int(player_data["Assists"]))
-    with col3:
-        st.metric("Goal Contributions", int(player_data["Goals"] + player_data["Assists"]))
+    # Check if player is a goalkeeper
+    is_goalkeeper = player_data["Position"] == "GK"
     
-    # Display advanced stats (per 90 minutes)
-    st.subheader("⚡ Per 90 Minutes")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Goals per 90", f"{player_data['Goals_per_90']:.2f}")
-    with col2:
-        st.metric("Assists per 90", f"{player_data['Assists_per_90']:.2f}")
-    with col3:
-        st.metric("G+A per 90", f"{player_data['G+A_per_90']:.2f}")
+    if is_goalkeeper:
+        # Goalkeeper-specific stats display
+        st.subheader("🧤 Goalkeeper Statistics")
+        
+        # Check if GK stats are available
+        has_gk_stats = 'Clean_Sheets' in player_data.index
+        
+        if has_gk_stats:
+            # Primary GK metrics
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Clean Sheets", int(player_data["Clean_Sheets"]))
+            with col2:
+                st.metric("Goals Conceded", int(player_data["Goals_Against"]))
+            with col3:
+                clean_sheet_pct = (player_data["Clean_Sheets"] / player_data["Appearances"] * 100) if player_data["Appearances"] > 0 else 0
+                st.metric("Clean Sheet %", f"{clean_sheet_pct:.1f}%")
+            
+            # Secondary GK metrics
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                if 'Save_Percentage' in player_data.index and player_data["Save_Percentage"] > 0:
+                    st.metric("Save %", f"{player_data['Save_Percentage']:.1f}%")
+                else:
+                    st.metric("Save %", "N/A")
+            with col2:
+                goals_per_game = player_data["Goals_Against"] / player_data["Appearances"] if player_data["Appearances"] > 0 else 0
+                st.metric("Goals Conceded/Game", f"{goals_per_game:.2f}")
+            with col3:
+                minutes_per_game = player_data["Minutes"] / player_data["Appearances"] if player_data["Appearances"] > 0 else 0
+                st.metric("Minutes/Game", f"{int(minutes_per_game)}")
+        else:
+            st.warning("⚠️ Detailed goalkeeper stats not available in current dataset.")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Appearances", int(player_data["Appearances"]))
+            with col2:
+                minutes_per_game = player_data["Minutes"] / player_data["Appearances"] if player_data["Appearances"] > 0 else 0
+                st.metric("Minutes/Game", f"{int(minutes_per_game)}")
     
-    # Display efficiency metrics
-    st.subheader("🎯 Efficiency")
-    col1, col2 = st.columns(2)
-    with col1:
-        mins_per_goal = player_data["Minutes_per_Goal"]
-        if mins_per_goal > 0 and mins_per_goal != np.inf:
-            st.metric("Minutes per Goal", f"{int(mins_per_goal)}")
-        else:
-            st.metric("Minutes per Goal", "N/A")
-    with col2:
-        mins_per_contrib = player_data["Minutes_per_Contribution"]
-        if mins_per_contrib > 0 and mins_per_contrib != np.inf:
-            st.metric("Minutes per Contribution", f"{int(mins_per_contrib)}")
-        else:
-            st.metric("Minutes per Contribution", "N/A")
+    else:
+        # Outfield player stats
+        st.subheader("📊 Season Totals")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Goals", int(player_data["Goals"]))
+        with col2:
+            st.metric("Assists", int(player_data["Assists"]))
+        with col3:
+            st.metric("Goal Contributions", int(player_data["Goals"] + player_data["Assists"]))
+        
+        # Display advanced stats (per 90 minutes)
+        st.subheader("⚡ Per 90 Minutes")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Goals per 90", f"{player_data['Goals_per_90']:.2f}")
+        with col2:
+            st.metric("Assists per 90", f"{player_data['Assists_per_90']:.2f}")
+        with col3:
+            st.metric("G+A per 90", f"{player_data['G+A_per_90']:.2f}")
+        
+        # Display efficiency metrics
+        st.subheader("🎯 Efficiency")
+        col1, col2 = st.columns(2)
+        with col1:
+            mins_per_goal = player_data["Minutes_per_Goal"]
+            if mins_per_goal > 0 and mins_per_goal != np.inf:
+                st.metric("Minutes per Goal", f"{int(mins_per_goal)}")
+            else:
+                st.metric("Minutes per Goal", "N/A")
+        with col2:
+            mins_per_contrib = player_data["Minutes_per_Contribution"]
+            if mins_per_contrib > 0 and mins_per_contrib != np.inf:
+                st.metric("Minutes per Contribution", f"{int(mins_per_contrib)}")
+            else:
+                st.metric("Minutes per Contribution", "N/A")
 
-    # Display full data table
+    # Display full data table (conditional based on position)
     st.subheader("📋 Complete Stats")
-    display_cols = ['Player', 'Team', 'Position', 'Goals', 'Assists', 'Appearances', 'Minutes', 
-                    'Goals_per_90', 'Assists_per_90', 'G+A_per_90']
-    st.dataframe(search_filtered_df[search_filtered_df["Player"] == player][display_cols], use_container_width=True)
+    if is_goalkeeper and 'Clean_Sheets' in player_data.index:
+        display_cols = ['Player', 'Team', 'Position', 'Appearances', 'Minutes', 'Clean_Sheets', 'Goals_Against']
+        if 'Save_Percentage' in player_data.index:
+            display_cols.append('Save_Percentage')
+    else:
+        display_cols = ['Player', 'Team', 'Position', 'Goals', 'Assists', 'Appearances', 'Minutes', 
+                        'Goals_per_90', 'Assists_per_90', 'G+A_per_90']
+    
+    # Only show columns that exist in the dataframe
+    available_display_cols = [col for col in display_cols if col in search_filtered_df.columns]
+    st.dataframe(search_filtered_df[search_filtered_df["Player"] == player][available_display_cols], use_container_width=True)
 
-    # Visualization - Goals vs Assists
-    st.subheader("📈 Goals vs Assists")
-    fig, ax = plt.subplots()
-    ax.bar(["Goals", "Assists"], [int(player_data["Goals"]),
-           int(player_data["Assists"])])
-    ax.set_ylabel("Count")
-    ax.set_title(f"{player}'s Goals and Assists ({player_data['Position']})")
-    st.pyplot(fig)
+    # Visualization - conditional based on position
+    if not is_goalkeeper:
+        st.subheader("📈 Goals vs Assists")
+        fig, ax = plt.subplots()
+        ax.bar(["Goals", "Assists"], [int(player_data["Goals"]),
+               int(player_data["Assists"])])
+        ax.set_ylabel("Count")
+        ax.set_title(f"{player}'s Goals and Assists ({player_data['Position']})")
+        st.pyplot(fig)
+    else:
+        # GK visualization - Clean Sheets vs Goals Conceded
+        if 'Clean_Sheets' in player_data.index:
+            st.subheader("📊 Clean Sheets vs Goals Conceded")
+            fig, ax = plt.subplots()
+            ax.bar(["Clean Sheets", "Goals Conceded"], 
+                   [int(player_data["Clean_Sheets"]), int(player_data["Goals_Against"])],
+                   color=['#4ECDC4', '#FF6B6B'])
+            ax.set_ylabel("Count")
+            ax.set_title(f"{player}'s Goalkeeper Performance")
+            st.pyplot(fig)
 
 # TAB 2: LEADERBOARDS
 with tab2:
