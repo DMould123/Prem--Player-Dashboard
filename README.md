@@ -44,7 +44,7 @@ Support
 
 📈 Visual charts for Goals vs Assists
 
-👥 Side-by-side player comparison mode
+👥 Side-by-side player comparison mode with search filters
 
 📉 Per-game statistics (goals/assists per game)
 
@@ -73,22 +73,20 @@ Internet connection (for downloading player data)
 Check Python installation
 python --version
 
-
 If Python is not installed, download it from python.org
 
 Make sure to check “Add Python to PATH” during installation.
 
 📦 Installation
-1. Clone or download the repository
-git clone https://github.com/yourusername/Prem--Player-Dashboard.git
-cd Prem--Player-Dashboard
 
+1. Clone or download the repository
+   git clone https://github.com/yourusername/Prem--Player-Dashboard.git
+   cd Prem--Player-Dashboard
 
 Or download and extract the ZIP file.
 
 2. Install required Python packages
-python -m pip install streamlit pandas matplotlib kagglehub
-
+   python -m pip install streamlit pandas matplotlib kagglehub
 
 Packages used:
 
@@ -111,7 +109,6 @@ Creates or updates premier_league_stats.csv with real 2024–25 season data.
 Step 2: Launch the dashboard
 streamlit run app.py
 
-
 Expected result:
 The dashboard opens automatically in your default web browser.
 
@@ -130,11 +127,11 @@ Use the sidebar to filter by team and/or position across all tabs
 In the Player Stats tab, use the search box to quickly find players by typing their name
 
 📁 Project Structure
-File	Description
-app.py	Streamlit web application
-scrape_fbref.py	Script to download and process player data
-premier_league_stats.csv	Player statistics (generated after scraping)
-README.md	Project documentation
+File Description
+app.py Streamlit web application
+scrape_fbref.py Script to download and process player data
+premier_league_stats.csv Player statistics (generated after scraping)
+README.md Project documentation
 📊 Data Source
 
 Player statistics are sourced from FBref via Kaggle.
@@ -152,24 +149,24 @@ Total Players: 574+
 📈 Available Statistics
 
 **Basic Stats:**
-Statistic	Description
-Player	Full player name
-Nationality	Player's country (3-letter code)
-Age	Player's current age
-Position	Player position (GK, DF, MF, FW)
-Team	Current club
-Goals	Total goals scored
-Assists	Total assists
-Appearances	Matches played (MP)
-Minutes	Minutes played
+Statistic Description
+Player Full player name
+Nationality Player's country (3-letter code)
+Age Player's current age
+Position Player position (GK, DF, MF, FW)
+Team Current club
+Goals Total goals scored
+Assists Total assists
+Appearances Matches played (MP)
+Minutes Minutes played
 
 **Advanced Metrics:**
-Statistic	Description
-Goals per 90	Goals scored per 90 minutes
-Assists per 90	Assists provided per 90 minutes
-G+A per 90	Total goal contributions per 90 minutes
-Minutes per Goal	Average minutes played per goal scored
-Minutes per Contribution	Average minutes per goal or assist
+Statistic Description
+Goals per 90 Goals scored per 90 minutes
+Assists per 90 Assists provided per 90 minutes
+G+A per 90 Total goal contributions per 90 minutes
+Minutes per Goal Average minutes played per goal scored
+Minutes per Contribution Average minutes per goal or assist
 🔄 Updating Data
 
 To refresh the dashboard with the latest statistics:
@@ -234,16 +231,13 @@ Create a new branch
 
 git checkout -b feature/improvement
 
-
 Commit your changes
 
 git commit -am "Add new feature"
 
-
 Push the branch
 
 git push origin feature/improvement
-
 
 Open a Pull Request
 
@@ -286,6 +280,5 @@ Open an issue on GitHub
 
 python scrape_fbref.py
 streamlit run app.py
-
 
 ❤️ Made with love for Premier League fans
