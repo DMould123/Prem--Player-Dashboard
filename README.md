@@ -44,6 +44,8 @@ Support
 
 🏆 Leaderboards showing top 10 goal scorers, assist providers, and total contributors
 
+🥅 Top 10 goalkeepers leaderboard ranked by Clean Sheets with performance metrics
+
 📈 Visual charts customized by position (GK vs outfield players)
 
 👥 Side-by-side player comparison mode with search filters

@@ -252,6 +252,25 @@ with tab2:
         top_ga_per90.index = range(1, len(top_ga_per90) + 1)
         st.dataframe(top_ga_per90, use_container_width=True)
     
+    # Top Goalkeepers
+    st.subheader("🧤 Top 10 Goalkeepers")
+    goalkeepers_df = df[df['Position'] == 'GK'].copy()
+    
+    if len(goalkeepers_df) > 0 and 'Clean_Sheets' in goalkeepers_df.columns:
+        # Calculate Clean Sheet %
+        goalkeepers_df['Clean_Sheet_%'] = (goalkeepers_df['Clean_Sheets'] / goalkeepers_df['Appearances'] * 100).round(1)
+        
+        # Get top 10 by Clean Sheets
+        top_goalkeepers = goalkeepers_df.nlargest(10, 'Clean_Sheets')[['Player', 'Team', 'Appearances', 'Clean_Sheets', 'Goals_Against', 'Clean_Sheet_%', 'Save_Percentage']]
+        top_goalkeepers.index = range(1, len(top_goalkeepers) + 1)
+        
+        # Format Save_Percentage
+        top_goalkeepers['Save_Percentage'] = top_goalkeepers['Save_Percentage'].apply(lambda x: f"{x:.1f}%" if x > 0 else "N/A")
+        
+        st.dataframe(top_goalkeepers, use_container_width=True)
+    else:
+        st.info("Goalkeeper statistics not available in current dataset.")
+    
     # Visualization
     st.subheader("📊 Top 5 Scorers vs Assisters")
     top5_scorers = df.nlargest(5, 'Goals')

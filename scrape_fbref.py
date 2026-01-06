@@ -4,7 +4,6 @@ import os
 import shutil
 import requests
 from io import StringIO
-from bs4 import BeautifulSoup
 
 # Download general player stats from Kaggle
 path = kagglehub.dataset_download("siddhrajthakor/fbref-premier-league-202425-player-stats-dataset")
