@@ -28,6 +28,19 @@ if csv_files:
         # Basic columns for all players
         base_cols = ['Player', 'Nation', 'Pos', 'Squad', 'Age', 'Born', 'Gls', 'Ast', 'MP', 'Min']
         
+        # Advanced metrics available in dataset
+        advanced_cols = []
+        if 'xG' in df.columns:
+            advanced_cols.append('xG')
+        if 'xAG' in df.columns:
+            advanced_cols.append('xAG')
+        if 'PrgC' in df.columns:  # Progressive Carries
+            advanced_cols.append('PrgC')
+        if 'PrgP' in df.columns:  # Progressive Passes
+            advanced_cols.append('PrgP')
+        if 'PrgR' in df.columns:  # Progressive Receptions
+            advanced_cols.append('PrgR')
+        
         # Check for goalkeeper-specific columns (if they exist)
         gk_cols = []
         if 'CS' in df.columns:  # Clean Sheets
@@ -38,7 +51,7 @@ if csv_files:
             gk_cols.append('Save%' if 'Save%' in df.columns else 'Saves%')
         
         # Combine columns
-        all_cols = base_cols + gk_cols
+        all_cols = base_cols + advanced_cols + gk_cols
         available_cols = [col for col in all_cols if col in df.columns]
         
         df_clean = df[available_cols].copy()
@@ -56,6 +69,18 @@ if csv_files:
             'MP': 'Appearances',
             'Min': 'Minutes'
         }
+        
+        # Add advanced metric renames
+        if 'xG' in df_clean.columns:
+            rename_map['xG'] = 'xG'
+        if 'xAG' in df_clean.columns:
+            rename_map['xAG'] = 'xAG'
+        if 'PrgC' in df_clean.columns:
+            rename_map['PrgC'] = 'Progressive_Carries'
+        if 'PrgP' in df_clean.columns:
+            rename_map['PrgP'] = 'Progressive_Passes'
+        if 'PrgR' in df_clean.columns:
+            rename_map['PrgR'] = 'Progressive_Receptions'
         
         # Add GK stat renames if they exist
         if 'CS' in df_clean.columns:

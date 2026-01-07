@@ -137,6 +137,9 @@ with tab1:
                 st.metric("Minutes/Game", f"{int(minutes_per_game)}")
     
     else:
+        # Check if player is a midfielder
+        is_midfielder = player_data["Position"] == "MF"
+        
         # Outfield player stats
         st.subheader("📊 Season Totals")
         col1, col2, col3 = st.columns(3)
@@ -146,6 +149,37 @@ with tab1:
             st.metric("Assists", int(player_data["Assists"]))
         with col3:
             st.metric("Goal Contributions", int(player_data["Goals"] + player_data["Assists"]))
+        
+        # Midfielder-specific advanced stats
+        if is_midfielder and 'xG' in player_data.index and 'Progressive_Passes' in player_data.index:
+            st.subheader("⚽ Shooting Metrics")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Goals", int(player_data["Goals"]))
+            with col2:
+                if player_data['xG'] > 0:
+                    st.metric("Expected Goals (xG)", f"{player_data['xG']:.1f}")
+                else:
+                    st.metric("Expected Goals (xG)", "0.0")
+            
+            st.subheader("🎯 Passing Metrics")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Progressive Passes", int(player_data["Progressive_Passes"]))
+            with col2:
+                st.metric("Assists", int(player_data["Assists"]))
+            with col3:
+                if player_data['xAG'] > 0:
+                    st.metric("Expected Assists (xAG)", f"{player_data['xAG']:.1f}")
+                else:
+                    st.metric("Expected Assists (xAG)", "0.0")
+            
+            st.subheader("🏃 Possession Metrics")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Progressive Carries", int(player_data["Progressive_Carries"]))
+            with col2:
+                st.metric("Progressive Receptions", int(player_data["Progressive_Receptions"]))
         
         # Display advanced stats (per 90 minutes)
         st.subheader("⚡ Per 90 Minutes")
