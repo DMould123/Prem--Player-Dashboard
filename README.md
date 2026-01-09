@@ -32,25 +32,29 @@ Support
 
 📊 View comprehensive statistics for 574+ Premier League players
 
-🔍 Interactive player selection via dropdown
+�️ Modern wide-layout design for optimal viewing experience
 
-🔎 Player search filter to quickly find specific players
+🎴 Card-style player information display with clean visual hierarchy
 
-👤 Player profiles with nationality and age information
+🔍 Advanced search with autocomplete and instant filtering
+
+👤 Detailed player profiles with position, team, nationality, and age
 
 ⚽ Filter players by team and position (GK, DF, MF, FW)
 
 🧤 Position-specific displays with goalkeeper statistics (Clean Sheets, Goals Against, Save %)
 
+🎯 Midfielder-specific advanced stats (xG, xAG, Progressive Passes/Carries/Receptions)
+
 🏆 Leaderboards showing top 10 goal scorers, assist providers, and total contributors
 
 🥅 Top 10 goalkeepers leaderboard ranked by Clean Sheets with performance metrics
 
-📈 Visual charts customized by position (GK vs outfield players)
+📈 Side-by-side stats and charts layout for better data visualization
 
-👥 Side-by-side player comparison mode with search filters
+📊 Color-coded performance charts with grid lines
 
-📉 Per-game statistics (goals/assists per game)
+👥 Player comparison mode with dual search filters
 
 ⚡ Advanced per 90 minutes metrics (Goals/90, Assists/90, G+A/90)
 
@@ -58,11 +62,13 @@ Support
 
 📑 Organized tab interface (Player Stats, Leaderboards, Compare Players)
 
+🔽 Expandable sections to reduce clutter and improve navigation
+
+📱 Enhanced sidebar with summary statistics and filters
+
 🔄 Real-time data from FBref via Kaggle API
 
-💻 Clean and intuitive web interface
-
-⚡ Fast data loading and visualization
+💻 Clean and intuitive web interface with modern styling
 
 🔧 Prerequisites
 
@@ -170,6 +176,14 @@ Clean Sheets Matches with no goals conceded
 Goals Against Total goals conceded
 Save Percentage Shot save success rate
 Clean Sheet % Percentage of matches with clean sheets
+
+**Midfielder-Specific Stats:**
+Statistic Description
+xG Expected Goals (statistical measure of goal quality)
+xAG Expected Assists (statistical measure of assist quality)
+Progressive Passes Completed passes that move the ball significantly closer to the opponent's goal
+Progressive Carries Carries that move the ball significantly closer to the opponent's goal
+Progressive Receptions Successful passes received that move the ball significantly closer to the opponent's goal
 
 **Advanced Metrics:**
 Statistic Description
