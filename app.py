@@ -149,7 +149,7 @@ with tab1:
     
     if is_goalkeeper:
         # GOALKEEPER LAYOUT
-        has_gk_stats = 'Clean_Sheets' in player_data.index and player_data["Clean_Sheets"] > 0
+        has_gk_stats = 'Clean_Sheets' in player_data.index and pd.notna(player_data["Clean_Sheets"])
         
         if has_gk_stats:
             # Two column layout for GK
