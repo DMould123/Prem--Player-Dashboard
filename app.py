@@ -3,6 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Page config
+st.set_page_config(page_title="Premier League Dashboard", page_icon="⚽", layout="wide")
+
 df = pd.read_csv("premier_league_stats.csv")
 
 # Calculate advanced statistics (per 90 minutes)
@@ -17,203 +20,250 @@ df["Minutes_per_Contribution"] = (df["Minutes"] / (df["Goals"] + df["Assists"]))
 # Replace NaN and inf values with 0
 df = df.fillna(0)
 
-st.title("Premier League Player Stats")
+# Header
+st.markdown("# ⚽ Premier League Dashboard")
+st.markdown("### 2024-25 Season Player Statistics")
+st.markdown("---")
 
 # Create tabs for different views
-tab1, tab2, tab3 = st.tabs(["🏠 Player Stats", "🏆 Leaderboards", "👥 Compare Players"])
+tab1, tab2, tab3 = st.tabs(["📊 Player Stats", "🏆 Leaderboards", "⚖️ Compare Players"])
 
-# Add team filter in sidebar
-st.sidebar.header("Filters")
-teams = ["All Teams"] + sorted(df["Team"].unique().tolist())
-selected_team = st.sidebar.selectbox("Select Team", teams)
-
-# Add position filter with specific order
-position_order = ["GK", "DF", "MF", "FW"]
-available_positions = [pos for pos in position_order if pos in df["Position"].unique()]
-positions = ["All Positions"] + available_positions
-selected_position = st.sidebar.selectbox("Select Position", positions)
-
-# Filter dataframe by team and position
-filtered_df = df.copy()
-
-if selected_team != "All Teams":
-    filtered_df = filtered_df[filtered_df["Team"] == selected_team]
-
-if selected_position != "All Positions":
-    filtered_df = filtered_df[filtered_df["Position"] == selected_position]
-
-# Show filtered stats summary
-st.sidebar.metric("Filtered Players", len(filtered_df))
-if len(filtered_df) > 0:
-    st.sidebar.metric("Total Goals", int(filtered_df["Goals"].sum()))
-    st.sidebar.metric("Total Assists", int(filtered_df["Assists"].sum()))
+# Sidebar with better styling
+with st.sidebar:
+    st.markdown("## 🎯 Filters")
+    st.markdown("")
+    
+    # Team filter
+    teams = ["All Teams"] + sorted(df["Team"].unique().tolist())
+    selected_team = st.selectbox("⚽ Team", teams)
+    
+    # Position filter with specific order
+    position_order = ["GK", "DF", "MF", "FW"]
+    available_positions = [pos for pos in position_order if pos in df["Position"].unique()]
+    positions = ["All Positions"] + available_positions
+    selected_position = st.selectbox("📍 Position", positions)
+    
+    st.markdown("---")
+    
+    # Filter dataframe by team and position
+    filtered_df = df.copy()
+    
+    if selected_team != "All Teams":
+        filtered_df = filtered_df[filtered_df["Team"] == selected_team]
+    
+    if selected_position != "All Positions":
+        filtered_df = filtered_df[filtered_df["Position"] == selected_position]
+    
+    # Show filtered stats summary with better formatting
+    st.markdown("### 📈 Summary")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Players", len(filtered_df))
+    with col2:
+        st.metric("Teams", filtered_df["Team"].nunique())
+    
+    if len(filtered_df) > 0:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Goals", int(filtered_df["Goals"].sum()))
+        with col2:
+            st.metric("Assists", int(filtered_df["Assists"].sum()))
+    
+    st.markdown("---")
+    st.markdown("**Data Source:** FBref via Kaggle")
+    st.markdown("**Season:** 2024-25")
 
 # TAB 1: PLAYER STATS
 with tab1:
-    # Add search filter
-    search_term = st.text_input("🔍 Search Player", "", placeholder="Type player name...").strip()
+    # Search bar with better styling
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        search_term = st.text_input("🔍 Search for a player", "", placeholder="e.g., Haaland, Salah, De Bruyne...").strip()
     
     # Filter players based on search term
     if search_term:
         search_filtered_df = filtered_df[filtered_df["Player"].str.contains(search_term, case=False, na=False)]
         if len(search_filtered_df) == 0:
-            st.warning(f"No players found matching '{search_term}'")
+            st.error(f"❌ No players found matching '{search_term}'")
             st.stop()
     else:
         search_filtered_df = filtered_df
     
-    # Player selection from search-filtered list
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        player = st.selectbox("Select a player", search_filtered_df["Player"].unique())
     with col2:
-        st.metric("Total Results", len(search_filtered_df))
+        st.metric("📋 Results", len(search_filtered_df))
     
+    st.markdown("")
+    
+    # Player selection
+    player = st.selectbox("Select a player to view detailed stats", search_filtered_df["Player"].unique(), label_visibility="collapsed")
     player_data = search_filtered_df[search_filtered_df["Player"] == player].iloc[0]
 
-    # Display player name as header
-    st.markdown(f"## ⚽ {player}")
+    st.markdown("")
     
-    # Display position, team, nationality, and age
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(f"**Position:** {player_data['Position']} | **Age:** {int(player_data['Age'])}")
-    with col2:
-        st.markdown(f"**Team:** {player_data['Team']} | **Nationality:** {player_data['Nationality']}")
+    # Player Card Header
+    st.markdown(f"# {player}")
+    
+    # Player info in a clean card-style layout
+    info_col1, info_col2, info_col3, info_col4 = st.columns(4)
+    with info_col1:
+        st.markdown(f"**🎽 Position**")
+        st.markdown(f"### {player_data['Position']}")
+    with info_col2:
+        st.markdown(f"**⚽ Team**")
+        st.markdown(f"### {player_data['Team']}")
+    with info_col3:
+        st.markdown(f"**🌍 Nation**")
+        st.markdown(f"### {player_data['Nationality']}")
+    with info_col4:
+        st.markdown(f"**📅 Age**")
+        st.markdown(f"### {int(player_data['Age'])}")
     
     st.markdown("---")
-
-    # Display player basic info
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Appearances", int(player_data["Appearances"]))
-    with col2:
-        st.metric("Minutes Played", int(player_data["Minutes"]))
     
-    st.markdown("")  # Add spacing
+    # Key metrics row
+    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
+    with metric_col1:
+        st.metric("🏃 Appearances", int(player_data["Appearances"]))
+    with metric_col2:
+        st.metric("⏱️ Minutes", int(player_data["Minutes"]))
+    with metric_col3:
+        if player_data["Appearances"] > 0:
+            avg_mins = int(player_data["Minutes"] / player_data["Appearances"])
+            st.metric("📊 Mins/Game", avg_mins)
+        else:
+            st.metric("📊 Mins/Game", "N/A")
+    with metric_col4:
+        if player_data["Position"] != "GK":
+            st.metric("🎯 G+A", int(player_data["Goals"] + player_data["Assists"]))
+        else:
+            if 'Clean_Sheets' in player_data.index and player_data["Clean_Sheets"] > 0:
+                st.metric("🧤 Clean Sheets", int(player_data["Clean_Sheets"]))
+            else:
+                st.metric("🧤 Clean Sheets", "N/A")
+    
+    st.markdown("")
     
     # Check if player is a goalkeeper
     is_goalkeeper = player_data["Position"] == "GK"
     
     if is_goalkeeper:
-        # Goalkeeper-specific stats display
-        has_gk_stats = 'Clean_Sheets' in player_data.index
+        # GOALKEEPER LAYOUT
+        has_gk_stats = 'Clean_Sheets' in player_data.index and player_data["Clean_Sheets"] > 0
         
         if has_gk_stats:
-            with st.expander("🧤 **Goalkeeper Performance Stats**", expanded=True):
-                col1, col2, col3 = st.columns(3)
-                with col1:
+            # Two column layout for GK
+            left_col, right_col = st.columns([1, 1])
+            
+            with left_col:
+                st.markdown("### 🧤 Goalkeeper Performance")
+                
+                perf_col1, perf_col2 = st.columns(2)
+                with perf_col1:
                     st.metric("Clean Sheets", int(player_data["Clean_Sheets"]))
-                with col2:
-                    st.metric("Goals Conceded", int(player_data["Goals_Against"]))
-                with col3:
                     clean_sheet_pct = (player_data["Clean_Sheets"] / player_data["Appearances"] * 100) if player_data["Appearances"] > 0 else 0
                     st.metric("Clean Sheet %", f"{clean_sheet_pct:.1f}%")
+                with perf_col2:
+                    st.metric("Goals Conceded", int(player_data["Goals_Against"]))
+                    goals_per_game = player_data["Goals_Against"] / player_data["Appearances"] if player_data["Appearances"] > 0 else 0
+                    st.metric("Conceded/Game", f"{goals_per_game:.2f}")
                 
                 st.markdown("")
                 
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    if 'Save_Percentage' in player_data.index and player_data["Save_Percentage"] > 0:
-                        st.metric("Save %", f"{player_data['Save_Percentage']:.1f}%")
-                    else:
-                        st.metric("Save %", "N/A")
-                with col2:
-                    goals_per_game = player_data["Goals_Against"] / player_data["Appearances"] if player_data["Appearances"] > 0 else 0
-                    st.metric("Goals Conceded/Game", f"{goals_per_game:.2f}")
-                with col3:
-                    minutes_per_game = player_data["Minutes"] / player_data["Appearances"] if player_data["Appearances"] > 0 else 0
-                    st.metric("Minutes/Game", f"{int(minutes_per_game)}")
+                if 'Save_Percentage' in player_data.index and player_data["Save_Percentage"] > 0:
+                    st.metric("💪 Save Percentage", f"{player_data['Save_Percentage']:.1f}%")
             
-            with st.expander("📊 **Performance Visualization**", expanded=True):
-                fig, ax = plt.subplots(figsize=(8, 5))
+            with right_col:
+                st.markdown("### 📊 Performance Chart")
+                fig, ax = plt.subplots(figsize=(6, 4))
                 ax.bar(["Clean Sheets", "Goals Conceded"], 
                        [int(player_data["Clean_Sheets"]), int(player_data["Goals_Against"])],
-                       color=['#4ECDC4', '#FF6B6B'])
-                ax.set_ylabel("Count")
-                ax.set_title(f"{player}'s Goalkeeper Performance")
+                       color=['#2ecc71', '#e74c3c'])
+                ax.set_ylabel("Count", fontsize=11)
+                ax.grid(axis='y', alpha=0.3)
                 st.pyplot(fig)
         else:
-            st.warning("⚠️ Detailed goalkeeper stats not available in current dataset.")
+            st.info("⚠️ Detailed goalkeeper stats not available for this player")
     
     else:
-        # Check if player is a midfielder
+        # OUTFIELD PLAYER LAYOUT
         is_midfielder = player_data["Position"] == "MF"
         
-        # Outfield player stats
-        with st.expander("📊 **Season Totals**", expanded=True):
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Goals", int(player_data["Goals"]))
-            with col2:
-                st.metric("Assists", int(player_data["Assists"]))
-            with col3:
-                st.metric("Goal Contributions", int(player_data["Goals"] + player_data["Assists"]))
+        # Main stats in two columns
+        left_col, right_col = st.columns([1, 1])
         
-        # Midfielder-specific advanced stats
-        if is_midfielder and 'xG' in player_data.index and 'Progressive_Passes' in player_data.index:
-            with st.expander("⚽ **Shooting & Expected Stats**", expanded=False):
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Goals", int(player_data["Goals"]))
-                with col2:
-                    if player_data['xG'] > 0:
-                        st.metric("Expected Goals (xG)", f"{player_data['xG']:.1f}")
-                    else:
-                        st.metric("Expected Goals (xG)", "0.0")
-                with col3:
-                    if player_data['xAG'] > 0:
-                        st.metric("Expected Assists (xAG)", f"{player_data['xAG']:.1f}")
-                    else:
-                        st.metric("Expected Assists (xAG)", "0.0")
+        with left_col:
+            st.markdown("### ⚽ Attacking Stats")
             
-            with st.expander("🎯 **Passing & Progression**", expanded=False):
-                col1, col2, col3 = st.columns(3)
-                with col1:
+            stat_col1, stat_col2, stat_col3 = st.columns(3)
+            with stat_col1:
+                st.metric("Goals", int(player_data["Goals"]))
+            with stat_col2:
+                st.metric("Assists", int(player_data["Assists"]))
+            with stat_col3:
+                st.metric("G+A", int(player_data["Goals"] + player_data["Assists"]))
+            
+            st.markdown("")
+            
+            # Per 90 stats
+            st.markdown("**📈 Per 90 Minutes**")
+            per90_col1, per90_col2, per90_col3 = st.columns(3)
+            with per90_col1:
+                st.metric("G/90", f"{player_data['Goals_per_90']:.2f}")
+            with per90_col2:
+                st.metric("A/90", f"{player_data['Assists_per_90']:.2f}")
+            with per90_col3:
+                st.metric("G+A/90", f"{player_data['G+A_per_90']:.2f}")
+        
+        with right_col:
+            st.markdown("### 📊 Performance Chart")
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax.bar(["Goals", "Assists"], [int(player_data["Goals"]), int(player_data["Assists"])],
+                   color=['#e74c3c', '#3498db'])
+            ax.set_ylabel("Count", fontsize=11)
+            ax.grid(axis='y', alpha=0.3)
+            st.pyplot(fig)
+        
+        st.markdown("")
+        
+        # Midfielder-specific stats in expandable section
+        if is_midfielder and 'xG' in player_data.index and player_data['Progressive_Passes'] > 0:
+            with st.expander("🎯 **Advanced Midfielder Stats**", expanded=False):
+                adv_col1, adv_col2, adv_col3 = st.columns(3)
+                
+                with adv_col1:
+                    st.markdown("**Expected Stats**")
+                    st.metric("xG", f"{player_data['xG']:.1f}")
+                    st.metric("xAG", f"{player_data['xAG']:.1f}")
+                
+                with adv_col2:
+                    st.markdown("**Passing & Carries**")
                     st.metric("Progressive Passes", int(player_data["Progressive_Passes"]))
-                with col2:
                     st.metric("Progressive Carries", int(player_data["Progressive_Carries"]))
-                with col3:
+                
+                with adv_col3:
+                    st.markdown("**Receptions**")
                     st.metric("Progressive Receptions", int(player_data["Progressive_Receptions"]))
         
-        # Display advanced stats (per 90 minutes)
-        with st.expander("⚡ **Per 90 Minutes Stats**", expanded=False):
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Goals per 90", f"{player_data['Goals_per_90']:.2f}")
-            with col2:
-                st.metric("Assists per 90", f"{player_data['Assists_per_90']:.2f}")
-            with col3:
-                st.metric("G+A per 90", f"{player_data['G+A_per_90']:.2f}")
-        
-        # Display efficiency metrics
-        with st.expander("🎯 **Efficiency Metrics**", expanded=False):
-            col1, col2 = st.columns(2)
-            with col1:
+        # Efficiency metrics in expandable section
+        with st.expander("⚡ **Efficiency Metrics**", expanded=False):
+            eff_col1, eff_col2 = st.columns(2)
+            with eff_col1:
                 mins_per_goal = player_data["Minutes_per_Goal"]
                 if mins_per_goal > 0 and mins_per_goal != np.inf:
-                    st.metric("Minutes per Goal", f"{int(mins_per_goal)}")
+                    st.metric("⏱️ Minutes per Goal", f"{int(mins_per_goal)}")
                 else:
-                    st.metric("Minutes per Goal", "N/A")
-            with col2:
+                    st.metric("⏱️ Minutes per Goal", "N/A")
+            with eff_col2:
                 mins_per_contrib = player_data["Minutes_per_Contribution"]
                 if mins_per_contrib > 0 and mins_per_contrib != np.inf:
-                    st.metric("Minutes per Contribution", f"{int(mins_per_contrib)}")
+                    st.metric("⏱️ Minutes per Contribution", f"{int(mins_per_contrib)}")
                 else:
-                    st.metric("Minutes per Contribution", "N/A")
-        
-        # Visualization
-        with st.expander("📈 **Goals vs Assists Chart**", expanded=True):
-            fig, ax = plt.subplots(figsize=(8, 5))
-            ax.bar(["Goals", "Assists"], [int(player_data["Goals"]),
-                   int(player_data["Assists"])],
-                   color=['#FF6B6B', '#4ECDC4'])
-            ax.set_ylabel("Count")
-            ax.set_title(f"{player}'s Goals and Assists ({player_data['Position']})")
-            st.pyplot(fig)
+                    st.metric("⏱️ Minutes per Contribution", "N/A")
     
-    # Display full data table (conditional based on position)
-    with st.expander("📋 **Complete Stats Table**", expanded=False):
+    # Full stats table
+    st.markdown("---")
+    with st.expander("📋 **Full Statistics Table**", expanded=False):
         if is_goalkeeper and 'Clean_Sheets' in player_data.index:
             display_cols = ['Player', 'Team', 'Position', 'Appearances', 'Minutes', 'Clean_Sheets', 'Goals_Against']
             if 'Save_Percentage' in player_data.index:
