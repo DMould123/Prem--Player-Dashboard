@@ -30,6 +30,13 @@ tab1, tab2, tab3 = st.tabs(["📊 Player Stats", "🏆 Leaderboards", "⚖️ Co
 
 # Sidebar with better styling
 with st.sidebar:
+    st.markdown("""
+        <div style='text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; margin-bottom: 20px;'>
+            <h2 style='color: white; margin: 0; font-size: 24px;'>⚽ PL STATS</h2>
+            <p style='color: #e0e0e0; margin: 5px 0 0 0; font-size: 12px;'>Premier League Analytics</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
     st.markdown("## 🎯 Filters")
     st.markdown("")
     
