@@ -78,8 +78,15 @@ with st.sidebar:
             st.metric("Assists", int(filtered_df["Assists"].sum()))
     
     st.markdown("---")
-    st.markdown("**Data Source:** FBref via Kaggle")
-    st.markdown("**Season:** 2024-25")
+    
+    # Data Attribution
+    st.markdown("### 📊 Data Source")
+    st.markdown("""
+        **Season:** 2024-25  
+        **Source:** [FBref](https://fbref.com/) via [Kaggle](https://www.kaggle.com/datasets/siddhrajthakor/fbref-premier-league-202425-player-stats-dataset)
+        
+        Stats provided by FBref.com and Opta. Advanced metrics include Expected Goals (xG), Expected Assists (xAG), and Progressive actions.
+    """)
 
 # TAB 1: PLAYER STATS
 with tab1:
